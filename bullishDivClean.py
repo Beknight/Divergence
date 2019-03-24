@@ -33,9 +33,22 @@ def buildSigValleyList(valleyList):
                             
                     printText = "significant valley @" + str(valley.rsi) + " time: " + str(newtime)
                     #print(printText)
+           
         count += 1
 
     return sigValley
+
+def grabData(url):
+    resp = ""
+    data = []
+    try:
+        resp = urllib.request.urlopen(url).read()
+    except: 
+        data=[]
+        print("failed data grab")
+    
+    data = json.loads(resp)
+    return data 
 
 CandleAux = namedtuple("CandleAux", "rsi price time")
 OPENTIME = 0
@@ -58,12 +71,7 @@ while(1):
     for interval in intervalList:
         for symbol in symbolList:
             url = root_url + '?symbol=' + symbol + '&interval=' + interval
-            try:
-                resp = urllib.request.urlopen(url).read()
-            except: 
-                data=[]
-                print("failed data grab")
-            data = json.loads(resp)
+            data = grabData(url)
             index = 0
             candleAuxList = []
             valleyList = []
