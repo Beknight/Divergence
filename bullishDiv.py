@@ -11,6 +11,7 @@ import notify as ntfy
 from collections import namedtuple
 
 def buildSigValleyList(valleyList):
+    REQDELTA = 10
     sigValley = []
     length = len(valleyList)
     
@@ -25,6 +26,7 @@ def buildSigValleyList(valleyList):
             if (count < (length-1)):
                 left = valleyList[count - 1]
                 right = valleyList[count + 1]
+                
                 if ((left.rsi > valley.rsi) and (right.rsi > valley.rsi)):
                     sigValley.append(valley)
                     utctime = int(valley.time)/1000
@@ -33,9 +35,27 @@ def buildSigValleyList(valleyList):
                             
                     printText = "significant valley @" + str(valley.rsi) + " time: " + str(newtime)
                     #print(printText)
+                else:
+                    # if the prev rsi and this rsi delta by enough, then we classify that as significant
+                    rsiDelta = left.rsi - valley.rsi
+                    if (rsiDelta >= REQDELTA):
+                        sigValley.append(valley)
+                    
         count += 1
 
     return sigValley
+
+def grabData(url):
+    resp = ""
+    data = []
+    try:
+        resp = urllib.request.urlopen(url).read()
+    except: 
+        data=[]
+        print("failed data grab")
+    
+    data = json.loads(resp)
+    return data 
 
 CandleAux = namedtuple("CandleAux", "rsi price time")
 OPENTIME = 0
@@ -58,12 +78,7 @@ while(1):
     for interval in intervalList:
         for symbol in symbolList:
             url = root_url + '?symbol=' + symbol + '&interval=' + interval
-            try:
-                resp = urllib.request.urlopen(url).read()
-            except: 
-                data=[]
-                print("failed data grab")
-            data = json.loads(resp)
+            data = grabData(url)
             index = 0
             candleAuxList = []
             valleyList = []

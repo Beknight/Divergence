@@ -11,6 +11,7 @@ import notify as ntfy
 from collections import namedtuple
 
 def buildSigValleyList(valleyList):
+    REQDELTA = 10
     sigValley = []
     length = len(valleyList)
     
@@ -25,7 +26,8 @@ def buildSigValleyList(valleyList):
             if (count < (length-1)):
                 left = valleyList[count - 1]
                 right = valleyList[count + 1]
-                if ((left.rsi > valley.rsi) and (right.rsi > valley.rsi)):
+                
+                if ((left.rsi < valley.rsi) and (right.rsi < valley.rsi)):
                     sigValley.append(valley)
                     utctime = int(valley.time)/1000
                     pendulum.from_timestamp(utctime).to_datetime_string()
@@ -33,7 +35,12 @@ def buildSigValleyList(valleyList):
                             
                     printText = "significant valley @" + str(valley.rsi) + " time: " + str(newtime)
                     #print(printText)
-           
+                else:
+                    # if the prev rsi and this rsi delta by enough, then we classify that as significant
+                    rsiDelta = left.rsi - valley.rsi
+                    if (rsiDelta >= REQDELTA):
+                        sigValley.append(valley)
+                    
         count += 1
 
     return sigValley
@@ -92,7 +99,7 @@ while(1):
                     prevAux = candleAuxList[index-1]
                     curAux = candleAuxList[index]
                     nextAux = candleAuxList[index + 1]
-                    if((prevAux.rsi > curAux.rsi) and (nextAux.rsi > curAux.rsi)):
+                    if((prevAux.rsi < curAux.rsi) and (nextAux.rsi < curAux.rsi)):
                             valleyList.append(curAux)
 
                 index += 1
@@ -112,7 +119,7 @@ while(1):
                         ncRsi = nextCandle.rsi
                         curPrice = auxCandle.price
                         curRsi = auxCandle.rsi
-                        if ((curRsi > ncRsi) and (curPrice <= ncPrice)):
+                        if ((curRsi < ncRsi) and (curPrice >= ncPrice)):
                             utctime = int(auxCandle.time)/1000
                             pendulum.from_timestamp(utctime).to_datetime_string()
                             newtime = pendulum.from_timestamp(utctime, 'Australia/Sydney').to_datetime_string()
