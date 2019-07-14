@@ -47,7 +47,8 @@ def grabData(url):
         data=[]
         print("failed data grab")
     
-    data = json.loads(resp)
+    data = json.loads(resp.decode('utf-8'))
+    #data = resp.json()
     return data 
 
 CandleAux = namedtuple("CandleAux", "rsi price time")
