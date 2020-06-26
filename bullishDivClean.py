@@ -18,14 +18,14 @@ def buildSigValleyList(valleyList):
     count = 0
     for valley in valleyList: 
         # first valley is always significant
-        if (count == 0):
+        if count == 0:
             sigValley.append(valley)
         else:
             #if the valley right valley and prev valley are > then sig valley 
-            if (count < (length-1)):
+            if count < (length-1):
                 left = valleyList[count - 1]
                 right = valleyList[count + 1]
-                if ((left.rsi > valley.rsi) and (right.rsi > valley.rsi)):
+                if (left.rsi > valley.rsi) and (right.rsi > valley.rsi):
                     sigValley.append(valley)
                     utctime = int(valley.time)/1000
                     pendulum.from_timestamp(utctime).to_datetime_string()
@@ -125,7 +125,6 @@ while(1):
                                 print(tempString)
                                 divDict[key] = tempString
                                 ntfy.sendMessage(key + tempString)
-    #                            em.sendEmail(tempString)
                             divFound = True
                             break
                         count += 1

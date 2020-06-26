@@ -15,9 +15,8 @@ def calcRsi (index, data, epoch):
     rmaLoss = 0
     rmaGain = 0
     
-    if (index >= epoch):
-        i = 1
-        while (i <= index):
+    if index >= epoch:
+        for i in range(1, index+1):
             ##previous close
             prevClose = data[i-1][CLOSE]
             curClose = data[i][CLOSE]
@@ -30,12 +29,9 @@ def calcRsi (index, data, epoch):
                 rmaGain = rma(rmaGain, 0, epoch)
                 rmaLoss = rma(rmaLoss, prevCloseF - curCloseF, epoch)
 
-            i += 1
-    averageGain = 0.0
-    averageLoss = 0.0
     averageGain = rmaGain
     averageLoss = rmaLoss
-    if (averageLoss != 0):
+    if averageLoss != 0:
         rs = (averageGain)/(averageLoss)
         rsi = 100.0 - 100/(1.0 + rs)
     else: 
